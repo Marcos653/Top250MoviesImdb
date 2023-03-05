@@ -19,7 +19,7 @@ Esta aplicação foi feita para realizar consultas a api do imdb, capturando ran
 
 > ## Desafios:
 <p> Dia 1 - Consumir a API do IMDB, buscar os top 250 filmes da lista deles e imprimir o JSON correspondente no console. ✅ </p>
-<p> Dia 2 - Parsear a resposta JSON obtida a partir do IMDB para extrair as suas informações e atributos (como título, pôster, nota, etc). </p>
+<p> Dia 2 - Parsear a resposta JSON obtida a partir do IMDB para extrair as suas informações e atributos (como título, pôster, nota, etc). ✅ </p>
 <p> Dia 3 - Modelar o seu código de uma maneira melhor, pensando um pouco sobre Orientação a Objetos. Criará uma estrutura 'Movie' (Filme) com alguns atributos,
 com o intuito de que cada objeto desse tipo encapsule seus próprios dados. </p>
 <p> Dia 4 - Trabalhar com a saída e gerar uma página HTML a partir da lista de objetos que você obteve anteriormente.
