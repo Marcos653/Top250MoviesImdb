@@ -1,8 +1,10 @@
 package org.example;
 
 import org.example.model.Movie;
+import org.example.service.HtmlGenerator;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import static org.example.config.HttpClient.getApi;
@@ -22,6 +24,8 @@ public class Main {
 
         var movies = movie.addMovie(titles, urlImages, ratings, years);
 
-        movies.forEach(System.out::println);
+        PrintWriter writer = new PrintWriter("content.html");
+        new HtmlGenerator(writer).generate(movies);
+        writer.close();
     }
 }
