@@ -2,8 +2,7 @@ package org.example.config;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 
 public class HttpClient {
     private static final String key = System.getenv("SECRET_KEY");

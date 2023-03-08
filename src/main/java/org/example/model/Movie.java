@@ -5,6 +5,7 @@ import org.example.interfaces.MovieInterface;
 import java.util.*;
 
 public class Movie implements MovieInterface {
+
     private String title;
     private String urlImage;
     private Float rating;
