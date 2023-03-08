@@ -24,7 +24,7 @@ Esta aplicação foi feita para realizar consultas a api do imdb, capturando ran
 com o intuito de que cada objeto desse tipo encapsule seus próprios dados. ✅ </p>
 <p> Dia 4 - Trabalhar com a saída e gerar uma página HTML a partir da lista de objetos que você obteve anteriormente.
 A ideia será criar uma página HTML onde você possa ver as informações sobre o filme, incluindo o pôster e a nota. ✅ </p>
-<p> Dia 5 - Encapsular algumas das chamadas desenvolvidas até aqui em novas classes. </p>
+<p> Dia 5 - Encapsular algumas das chamadas desenvolvidas até aqui em novas classes. ✅ </p>
 <p> Dia 6 - Deixar o seu código mais genérico, ou seja, preparado para receber dados de outras APIs. Para isso, você usará interfaces. </p>
 <p> Dia 7 - Terá a possibilidade de ordenar a sua lista com base em diferentes atributos,
 utilizando a classe Collections e as interfaces Comparable e Comparator. </p>
