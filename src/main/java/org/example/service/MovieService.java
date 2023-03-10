@@ -1,11 +1,14 @@
 package org.example.service;
 
 import org.example.enums.Attribute;
+import org.example.interfaces.Content;
+import org.example.interfaces.JsonParser;
+import org.example.model.Movie;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MovieService {
+public class MovieService implements JsonParser {
 
     public static List<String> extractAttributes(String[] arrayMovies, Attribute attributeType) {
         if (arrayMovies == null) {
@@ -23,7 +26,9 @@ public class MovieService {
         }
 
         String[] parts = movie.split("\",\"");
-        String value = parts[attributeType.getValue()].substring(parts[attributeType.getValue()].indexOf(":")+1).replaceAll("\"","");
+        String value = parts[attributeType.getValue()]
+                .substring(parts[attributeType.getValue()]
+                        .indexOf(":")+1).replaceAll("\"","");
         return value;
     }
 
@@ -41,5 +46,19 @@ public class MovieService {
         }
 
         return json.substring(json.indexOf("[") + 1, json.indexOf("]"));
+    }
+
+    @Override
+    public List<Movie> addObject(List<String> titles,
+                                List<String> urlImages, List<String> ratings,
+                                List<String> years) {
+        var movies = new ArrayList<Movie>();
+
+        for (int i = 0; i < titles.size(); i++) {
+            movies.add(new Movie(titles.get(i), urlImages.get(i),
+                    Float.parseFloat(ratings.get(i)), Integer.parseInt(years.get(i))));
+        }
+
+        return movies;
     }
 }

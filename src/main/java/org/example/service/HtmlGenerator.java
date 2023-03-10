@@ -1,7 +1,7 @@
 package org.example.service;
 
+import org.example.interfaces.Content;
 import org.example.interfaces.HtmlGeneratorInterface;
-import org.example.model.Movie;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -15,7 +15,7 @@ public class HtmlGenerator implements HtmlGeneratorInterface {
     }
 
     @Override
-    public void generate(List<Movie> movies) {
+    public void generate(List<? extends Content> contentList) {
         writer.println(
                 """
                 <html>
@@ -31,7 +31,7 @@ public class HtmlGenerator implements HtmlGeneratorInterface {
                     <body>
                 """);
 
-        for (Movie movie : movies) {
+        for (Content content : contentList) {
             String div =
                     """
                     <div class=\"card text-white bg-dark mb-3\" style=\"max-width: 18rem;\">
@@ -43,9 +43,9 @@ public class HtmlGenerator implements HtmlGeneratorInterface {
                     </div>
                     """;
 
-            writer.println(String.format(div, movie.getTitle(),
-                    movie.getUrlImage(), movie.getTitle(),
-                    movie.getRating(), movie.getYear()));
+            writer.println(String.format(div, content.title(),
+                    content.urlImage(), content.title(),
+                    content.rating(), content.year()));
         }
 
         writer.println(
