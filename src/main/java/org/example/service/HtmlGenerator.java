@@ -37,13 +37,14 @@ public class HtmlGenerator implements HtmlGeneratorInterface {
                     <div class=\"card text-white bg-dark mb-3\" style=\"max-width: 18rem;\">
                         <h4 class=\"card-header\">%s</h4>
                         <div class=\"card-body\">
+                        <span class=\"card-text mt-3\" style=\"color: gray;\" > %s </span>
                             <img class=\"card-img\" src=\"%s\" alt=\"%s\">
                             <p class=\"card-text mt-2\">Nota: %s - Ano: %s</p>
                         </div>
                     </div>
                     """;
 
-            writer.println(String.format(div, content.title(),
+            writer.println(String.format(div, content.title(), content.type(),
                     content.urlImage(), content.title(),
                     content.rating(), content.year()));
         }

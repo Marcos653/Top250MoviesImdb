@@ -19,15 +19,12 @@ public class MarvelApiClient implements ApiClient {
         String hash = HashUtils.getHashMd5(timestamp + privateKey + key);
         this.endpoint = String.format("https://gateway.marvel.com:443/v1/public/series?ts=%s&hash=%s&apikey=%s",
                 timestamp, hash, key);
-        System.out.println(endpoint);
     }
 
     @Override
     public String getApi() {
         String json = executeRequest();
-        System.out.println(json);
         return json;
-
     }
 
     private String executeRequest() {

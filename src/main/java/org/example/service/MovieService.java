@@ -24,6 +24,7 @@ public class MovieService implements JsonParser {
         List<String> urlImages = parseUrlImages(moviesArray);
         List<String> ratings = parseRatings(moviesArray);
         List<String> years = parseYears(moviesArray);
+        String typevalue = "movie";
 
         List<Movie> movies = new ArrayList<>();
 
@@ -32,7 +33,8 @@ public class MovieService implements JsonParser {
                     new Movie(titles.get(i),
                             urlImages.get(i),
                             ratings.get(i),
-                            years.get(i)));
+                            years.get(i),
+                            typevalue));
         }
 
         return movies;

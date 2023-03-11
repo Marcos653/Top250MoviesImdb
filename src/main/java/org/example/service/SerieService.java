@@ -24,12 +24,14 @@ public class SerieService implements JsonParser {
             String titleValue = parseAttribute(seriesArray[i], "title");
             String yearValue = parseAttribute(seriesArray[i], "startYear");
             String ratingValue = parseAttribute(seriesArray[i], "rating");
+            String typevalue = "serie";
+
 
             if(ratingValue.isEmpty()) {
                 ratingValue = "Sem";
             }
             String thumbnailValue = parseThumbnailAttribute(seriesArray[i]);
-            series.add(new Serie(titleValue, thumbnailValue, ratingValue, yearValue));
+            series.add(new Serie(titleValue, thumbnailValue, ratingValue, yearValue, typevalue));
         }
 
         return series;
