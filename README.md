@@ -27,7 +27,7 @@ A ideia será criar uma página HTML onde você possa ver as informações sobre
 <p> Dia 5 - Encapsular algumas das chamadas desenvolvidas até aqui em novas classes. ✅ </p>
 <p> Dia 6 - Deixar o seu código mais genérico, ou seja, preparado para receber dados de outras APIs. Para isso, você usará interfaces. ✅ </p>
 <p> Dia 7 - Terá a possibilidade de ordenar a sua lista com base em diferentes atributos,
-utilizando a classe Collections e as interfaces Comparable e Comparator. </p>
+utilizando a classe Collections e as interfaces Comparable e Comparator. ✅ </p>
 
 <br></br>
 
