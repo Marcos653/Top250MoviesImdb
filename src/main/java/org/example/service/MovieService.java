@@ -1,64 +1,80 @@
 package org.example.service;
 
-import org.example.enums.Attribute;
-import org.example.interfaces.Content;
 import org.example.interfaces.JsonParser;
 import org.example.model.Movie;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MovieService implements JsonParser {
 
-    public static List<String> extractAttributes(String[] arrayMovies, Attribute attributeType) {
-        if (arrayMovies == null) {
-            throw new IllegalArgumentException("arrayMovies cannot be null");
-        }
+    private String json;
 
-        return Arrays.stream(arrayMovies)
-                .map(movie -> extractAttributeFromMovie(movie, attributeType))
-                .collect(Collectors.toList());
+    public MovieService(String json) {
+        this.json = json;
     }
 
-    private static String extractAttributeFromMovie(String movie, Attribute attributeType) {
-        if (movie == null) {
-            throw new IllegalArgumentException("movie cannot be null");
-        }
+    public List<Movie> parse() {
+        String[] moviesArray = parseJsonMovies(json);
 
-        String[] parts = movie.split("\",\"");
-        String value = parts[attributeType.getValue()]
-                .substring(parts[attributeType.getValue()]
-                        .indexOf(":")+1).replaceAll("\"","");
-        return value;
-    }
+        List<String> titles = parseTitles(moviesArray);
+        List<String> urlImages = parseUrlImages(moviesArray);
+        List<String> ratings = parseRatings(moviesArray);
+        List<String> years = parseYears(moviesArray);
 
-    public static String[] extractArrayMovies(String json) {
-        if (json == null) {
-            throw new IllegalArgumentException("json cannot be null");
-        }
+        List<Movie> movies = new ArrayList<>();
 
-        return json.split("},");
-    }
-
-    public static String formatJson(String json) {
-        if (json == null) {
-            throw new IllegalArgumentException("json cannot be null");
-        }
-
-        return json.substring(json.indexOf("[") + 1, json.indexOf("]"));
-    }
-
-    @Override
-    public List<Movie> addObject(List<String> titles,
-                                List<String> urlImages, List<String> ratings,
-                                List<String> years) {
-        var movies = new ArrayList<Movie>();
-
-        for (int i = 0; i < titles.size(); i++) {
-            movies.add(new Movie(titles.get(i), urlImages.get(i),
-                    Float.parseFloat(ratings.get(i)), Integer.parseInt(years.get(i))));
+        for (int i =0; i < titles.size(); i++) {
+            movies.add(
+                    new Movie(titles.get(i),
+                            urlImages.get(i),
+                            ratings.get(i),
+                            years.get(i)));
         }
 
         return movies;
+    }
+
+    private  String[] parseJsonMovies(String json) {
+        Matcher matcher = Pattern.compile(".*\\[(.*)\\].*").matcher(json);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("no match in " + json);
+        }
+
+        String[] moviesArray = matcher.group(1).split("\\},\\{");
+        moviesArray[0] = moviesArray[0].substring(1);
+        int last = moviesArray.length - 1;
+        String lastString = moviesArray[last];
+        moviesArray[last] = lastString.substring(0, lastString.length() - 1);
+        return moviesArray;
+    }
+
+    private  List<String> parseTitles(String[] moviesArray) {
+        return parseAttribute(moviesArray, 3);
+    }
+
+    private  List<String> parseUrlImages(String[] moviesArray) {
+        return parseAttribute(moviesArray, 5);
+    }
+
+    private  List<String> parseRatings(String[] moviesArray) {
+        return parseAttribute(moviesArray, 7);
+    }
+
+    private  List<String> parseYears(String[] moviesArray) {
+        return parseAttribute(moviesArray, 4);
+    }
+
+
+    private  List<String> parseAttribute(String[] jsonMovies, int pos) {
+        return Stream.of(jsonMovies)
+                .map(e -> e.split("\",\"")[pos])
+                .map(e -> e.split(":\"")[1])
+                .map(e -> e.replaceAll("\"", ""))
+                .collect(Collectors.toList());
     }
 }

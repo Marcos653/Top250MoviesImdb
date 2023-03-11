@@ -1,67 +1,136 @@
 package org.example.service;
 
-import org.example.enums.Attribute;
 import org.example.interfaces.JsonParser;
 import org.example.model.Serie;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SerieService implements JsonParser {
 
-    public static List<String> extractAttributes(String[] arraySeries, Attribute attributeType) {
-        if (arraySeries == null) {
-            throw new IllegalArgumentException("arraySeries cannot be null");
-        }
+    private String json;
 
-        return Arrays.stream(arraySeries)
-                .map(serie -> extractAttributeFromSerie(serie, attributeType))
-                .collect(Collectors.toList());
+    public SerieService(String json) {
+        this.json = json;
     }
 
-    private static String extractAttributeFromSerie(String serie, Attribute attributeType) {
-        if (serie == null) {
-            throw new IllegalArgumentException("serie cannot be null");
-        }
+    public List<Serie> parse() {
+        String[] seriesArray = parseJsonSeries(this.json);
 
-        String[] parts = serie.split("\",\"");
-        String value = parts[attributeType.getValue()]
-                .substring(parts[attributeType.getValue()]
-                        .indexOf(":")+1).replaceAll("\"","");
-        return value;
-    }
+        List<Serie> series = new ArrayList<>();
+        for (int i = 0; i < seriesArray.length; i++) {
+            String titleValue = parseAttribute(seriesArray[i], "title");
+            String yearValue = parseAttribute(seriesArray[i], "startYear");
+            String ratingValue = parseAttribute(seriesArray[i], "rating");
 
-    public static String[] extractArraySerie(String json) {
-        if (json == null) {
-            throw new IllegalArgumentException("json cannot be null");
-        }
-
-        return json.split("},");
-    }
-
-    public static String formatJson(String json) {
-        if (json == null) {
-            throw new IllegalArgumentException("json cannot be null");
-        }
-
-        return json.substring(json.indexOf("[") + 1, json.indexOf("]"));
-    }
-
-    @Override
-    public List<Serie> addObject(List<String> titles,
-                                 List<String> urlImages, List<String> ratings,
-                                 List<String> years) {
-        var series = new ArrayList<Serie>();
-
-        for (int i = 0; i < titles.size(); i++) {
-            series.add(new Serie(titles.get(i), urlImages.get(i),
-                    Float.parseFloat(ratings.get(i)), Integer.parseInt(years.get(i))));
+            if(ratingValue.isEmpty()) {
+                ratingValue = "Sem";
+            }
+            String thumbnailValue = parseThumbnailAttribute(seriesArray[i]);
+            series.add(new Serie(titleValue, thumbnailValue, ratingValue, yearValue));
         }
 
         return series;
     }
 
+    //"thumbnail":{"path":"http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available","extension":"jpg"},
+    private String parseThumbnailAttribute(String jsonSerie) {
 
+        Pattern pattern = Pattern.compile("\"thumbnail\":\\{\"path\":\"");
+        Matcher matcher = pattern.matcher(jsonSerie);
+
+        if(!matcher.find()) {
+            throw new IllegalStateException("Thumbnail não encontrado");
+        }
+
+        int posIniAttribute = matcher.end();
+        String thumbnail_ext = jsonSerie.substring(posIniAttribute);
+
+        pattern = Pattern.compile("\",\"extension\":\"");
+        matcher = pattern.matcher(thumbnail_ext);
+
+        if(!matcher.find()) {
+            throw new IllegalStateException("Thumbnail extension não encontrado");
+        }
+
+        posIniAttribute = matcher.start();
+        String thumbnail = thumbnail_ext.substring(0 , posIniAttribute);
+
+        String ext = thumbnail_ext.substring(matcher.end(), matcher.end() + 3);
+
+        return cleanUp(thumbnail) + "." + ext;
+    }
+
+    private String parseAttribute(String jsonSerie, String atributeName) {
+
+        int posIniAttribute = findInitialPositionOfAttribute(jsonSerie, atributeName);
+        jsonSerie = jsonSerie.substring(posIniAttribute);
+
+        int posEndAttribute = findFinalPositionOfAttribute(jsonSerie, atributeName);
+        String attributeValue = jsonSerie.substring(0 , posEndAttribute);
+
+        String value = cleanUp(attributeValue);
+
+        return value;
+    }
+
+    private int findFinalPositionOfAttribute(String jsonSerie, String atributeName) {
+        Pattern endPattern = Pattern.compile(",");
+        Matcher endMatcher = endPattern.matcher(jsonSerie);
+
+        if(!endMatcher.find()) {
+            throw new IllegalStateException(atributeName + " não encontrado");
+        }
+        int posEndAttribute = endMatcher.start();
+        return posEndAttribute;
+    }
+
+    private int findInitialPositionOfAttribute(String jsonSerie, String atributeName) {
+        Pattern beginPattern = Pattern.compile("\"" + atributeName + "\":");
+
+        Matcher beginMatcher = beginPattern.matcher(jsonSerie);
+        if(!beginMatcher.find()) {
+            throw new IllegalStateException(atributeName + " não encontrado");
+        }
+
+        int posIniAttribute = beginMatcher.end();
+        return posIniAttribute;
+    }
+
+    private static String cleanUp(String attributeValue) {
+        if(attributeValue.startsWith("\"")) {
+            attributeValue = attributeValue.substring(1);
+        }
+
+        if(attributeValue.endsWith(",")) {
+            attributeValue = attributeValue.substring(0, attributeValue.length() - 1);
+        }
+
+        if(attributeValue.endsWith("\"")) {
+            attributeValue = attributeValue.substring(0, attributeValue.length() - 1);
+        }
+
+        return attributeValue.trim();
+    }
+
+    static Pattern BEGIN_ARRAY = Pattern.compile(".*\"results\":");
+    static Pattern END_ARRAY = Pattern.compile(".*\\]}}");
+
+    private String[] parseJsonSeries(String body) {
+
+        Matcher matcher = BEGIN_ARRAY.matcher(body);
+        matcher.find();
+        int begin = matcher.end();
+
+        matcher = END_ARRAY.matcher(body);
+        matcher.find();
+        int end = matcher.end();
+
+        String jsonStringSeries = body.substring(begin, end);
+
+        String[] jsonMovies = jsonStringSeries.split("\\},\\{\"id\"");
+        return jsonMovies;
+    }
 }

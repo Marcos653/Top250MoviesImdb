@@ -2,37 +2,30 @@ package org.example;
 
 import org.example.config.ImdbApiClient;
 import org.example.config.MarvelApiClient;
+import org.example.interfaces.Content;
+import org.example.interfaces.JsonParser;
 import org.example.service.HtmlGenerator;
-import org.example.service.MovieService;
 import org.example.service.SerieService;
 
 import java.io.*;
-
-import static org.example.enums.Attribute.*;
-import static org.example.service.MovieService.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var movieService = new MovieService();
-        var serieService = new SerieService();
         var imdbApi = new ImdbApiClient();
         var marvelApi = new MarvelApiClient();
 
-//        var jsonImdb = formatJson(imdbApi.getApi());
-        var jsonMarvel = formatJson(marvelApi.getApi());
-        var arrayObjects = extractArrayMovies(jsonMarvel);
-
-        var titles = extractAttributes(arrayObjects, TITLE);
-        var urlImages = extractAttributes(arrayObjects, IMAGE);
-        var ratings = extractAttributes(arrayObjects, RATING);
-        var years = extractAttributes(arrayObjects, YEAR);
-
-//        var movies = movieService.addObject(titles, urlImages, ratings, years);
-        var series = serieService.addObject(titles, urlImages, ratings, years);
+//        JsonParser jsonParserImdb = new MovieService(imdbApi.getApi());
+//        List<? extends Content> contentList = jsonParserImdb.parse();
+        JsonParser jsonParserMarvel = new SerieService(marvelApi.getApi());
+        List<? extends Content> contentList = jsonParserMarvel.parse();
+        Collections.sort(contentList, Comparator.comparing(Content::title));
 
         PrintWriter writer = new PrintWriter("content.html");
-        new HtmlGenerator(writer).generate(series);
+        new HtmlGenerator(writer).generate(contentList);
         writer.close();
     }
 }

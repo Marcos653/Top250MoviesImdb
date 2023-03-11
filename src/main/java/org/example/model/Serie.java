@@ -5,9 +5,12 @@ import org.example.interfaces.Content;
 public record Serie(
         String title,
         String urlImage,
-        Float rating,
-        Integer year)
-
+        String rating,
+        String year)
         implements Content {
 
+    @Override
+    public int compareTo(Content c) {
+        return this.rating().compareTo(c.rating());
+    }
 }
